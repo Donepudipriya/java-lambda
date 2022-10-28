@@ -12,8 +12,8 @@ pipeline {
     }
 
     environment {
-        AWS_ACCESS_KEY = credentials('aws_access_key')
-        AWS_SECRET_KEY = credentials('aws_secret_key')
+        AWS_ACCESS_KEY = credentials('aws_access_key') 
+        AWS_SECRET_KEY = credentials('aws_access_secret') 
         ARTIFACTID = readMavenPom().getArtifactId()
         VERSION = readMavenPom().getVersion()
     }
@@ -56,11 +56,11 @@ pipeline {
 
                     sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY'
                     sh 'aws configure set aws_secret_access_key $AWS_SECRET_KEY'
-                    sh 'aws configure set region us-east-1' 
-                    sh "aws s3 cp target/${JARNAME} s3://bermtec228/lambda-test/"
+                    sh 'aws configure set region us-east-2' 
+                    sh "aws s3 cp target/${JARNAME} s3://mybuck123/lambda-test/"
 
 
-                    sh "aws lambda update-function-code --function-name test  --zip-file fileb://target/${JARNAME}"
+                    sh "aws lambda update-function-code --function-name lambdatest  --zip-file fileb://target/${JARNAME}"
 
                 }          
             }
@@ -91,10 +91,10 @@ pipeline {
                         echo "VERSION: ${VERSION}"
                         JARNAME = ARTIFACTID+'-'+VERSION+'.jar'
 
-                        sh "aws s3 cp target/${JARNAME} s3://bermtec228/lambda-prod/"
+                        sh "aws s3 cp target/${JARNAME} s3://mybuck123/lambda-prod/"
                         //  sh './deploy-test.sh $AWS_ACCESS_KEY $AWS_SECRET_KEY'
                         // if (does_lambda_exist('prodfunction')) {
-                            sh "aws lambda update-function-code --function-name prodfunction --s3-bucket bermtec228 --s3-key lambda-prod/${JARNAME}"
+                            sh "aws lambda update-function-code --function-name lambdaprod --s3-bucket mybuck123 --s3-key lambda-prod/${JARNAME}"
                         //}  
                     }
                 }
@@ -123,7 +123,7 @@ def does_lambda_exist(String name) {
   isexist=false
   echo $name
   try{
-    sh  'aws lambda get-function --function-name test'
+    sh  'aws lambda get-function --function-name lambdatest'
     isexist=true
   }
   catch(Exception e) {
